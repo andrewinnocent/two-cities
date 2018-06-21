@@ -5,6 +5,23 @@
     <title>Two Cities</title>
   </head>
   <body>
-    
+    <h1>Two Cities</h1>
+
+    <h3>Instructions:</h3>
+    <p>Enter a city in each input field to see the geo-location of each city. If two valid cities are input, you'll see how far apart they are from each other in kilometers (km)!</p>
+
+    <form id="form" action="submit">
+      <input type="text" placeholder="City 1" id="city-one">
+      <input type="text" placeholder="City 2" id="city-two">
+      <button id="submit-form">Submit!</button>
+    </form>
+
+    <div id="city-one-location"></div>
+    <div id="city-two-location"></div>
+    <div id="distance-between-cities"></div>
+    <div id="google-api"></div>
+
+    <script type="text/javascript" src="index.js"></script>
   </body>
+
 </html>
