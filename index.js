@@ -4,58 +4,38 @@ $(document).ready()
 // Function to submit inputs to geocode api on form submit
 $('#form').submit(function () {
   event.preventDefault();
-  // assign city to variables
-  let city1 = $('#city-one').val()
-  let city2 = $('#city-two').val()
-  // console.log("City 1 is", city1);
-  // console.log("City 2 is", city2);
 
+  let city1 = $('#city-one').val();
+  let city2 = $('#city-two').val();
+
+  // City 1 GET request
   $.getJSON("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(city1) + "&key=AIzaSyCVJFarvBKFpXZDJeAgbBbz4rOjFVvbfrQ",
-    function(results, status) {
-      console.log('Results is', results);
-      console.log('Status is', status); // Status is 'success', not 'OK'.
-          if (status === 'OK') { // Changing to 'success' returns undefined.
-            console.log("Connected to the API and the city is valid!"); // even though successful, return else result...
-            $('#city-one-location').text(results[0].geometry.location)
+    function(results) {
+      let cityOneInfo = results.results[0]
+      if (results.status === 'OK') { // results is returning json object with status.
+          $('#city-one-location').text(`City 1: ${cityOneInfo.formatted_address}. Lat: ${cityOneInfo.geometry.location.lat}, Lng: ${cityOneInfo.geometry.location.lng}`)
           } else {
-            $('#city-one-location').text("Invalid input. Please enter a valid city.")
+            $('#city-one-location').text("Invalid City 1 input. Please enter a valid city.").css("color", "red")
           }
-        })
-  $.getJSON("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(city2) + "&key=AIzaSyCVJFarvBKFpXZDJeAgbBbz4rOjFVvbfrQ",
-    function(results, status) {
-        if (status === 'OK') {
-          $('#city-two-location').text(results[0].geometry.location)
-        } else {
-          $('#city-two-location').text("Invalid input. Please enter a valid city.")
-        }
-      })
-
+      let cityOneGeocode = cityOneInfo.geometry.location  // The desire is to access this variable for the computeDistanceBetween()
+      console.log(`1: ${cityOneLat}, 2: ${cityOneLng}, 3: ${cityOneCombo}`);
     })
 
-// MAP
-// function initMap() {
-//   var map = new google.maps.Map(document.getElementById('map'), {
-//     zoom: 2,
-//     center: {lat: 0, lng: 0}
-//   });
-//   var geocoder = new google.maps.Geocoder();
-//
-//   document.getElementById('submit').addEventListener('click', function() {
-//     geocodeAddress(geocoder, map);
-//   });
-// }
-//
-// function geocodeAddress(geocoder, resultsMap) {
-//   var address = document.getElementById('address').value;
-//   geocoder.geocode({'address': address}, function(results, status) {
-//     if (status === 'OK') {
-//       resultsMap.setCenter(results[0].geometry.location);
-//       var marker = new google.maps.Marker({
-//         map: resultsMap,
-//         position: results[0].geometry.location
-//       });
-//     } else {
-//       ('Geocode was not successful for the following reason: ' + status);
-//     }
-//   });
-// }
+  // City 2 GET request
+  $.getJSON("https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(city2) + "&key=AIzaSyCVJFarvBKFpXZDJeAgbBbz4rOjFVvbfrQ",
+    function(results) {
+      let cityTwoInfo = results.results[0]
+      if (results.status === 'OK') {
+          $('#city-two-location').text(`City 2: ${cityTwoInfo.formatted_address}. Lat: ${cityTwoInfo.geometry.location.lat}, Lng: ${cityTwoInfo.geometry.location.lng}`)
+        } else {
+          $('#city-two-location').text("Invalid City 2 input. Please enter a valid city.").css("color", "red")
+        }
+      let cityTwoGeocode = cityTwoInfo.geometry.location  // The desire is to access this variable for the computeDistanceBetween()
+    })
+
+  // Distance between cities
+  // Hardcoded it calculated appropriately. This issue I believe I need to resolve is scope to access cityOneGeocode & cityTwoGeocode
+  $("#distance-between").text(`Distance between ${city1} and ${city2} is: ${(google.maps.geometry.spherical.computeDistanceBetween(
+    new google.maps.LatLng(cityOneCombo),
+    new google.maps.LatLng(cityTwoGeocode))/1000).toFixed(2)} km.`)
+})
